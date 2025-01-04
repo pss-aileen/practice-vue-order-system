@@ -20,6 +20,7 @@ const productImage = ref('https://placehold.jp/150x150.png')
 
 function addProduct(e: Event) {
   e.preventDefault()
+
   const product: productType = {
     name: productName.value,
     category: productCategory.value,
@@ -47,8 +48,14 @@ function addProduct(e: Event) {
           <table>
             <tbody>
               <tr>
+                <th>product id</th>
+                <td><input type="text" value="PDC-A-00001" disabled /></td>
+              </tr>
+              <tr>
                 <th>name</th>
-                <td><input type="text" v-model="productName" /></td>
+                <td>
+                  <input type="text" v-model.trim="productName" />
+                </td>
               </tr>
               <tr>
                 <th>category</th>
@@ -75,7 +82,7 @@ function addProduct(e: Event) {
                 </td>
               </tr>
               <tr>
-                <th>productStock</th>
+                <th>stock</th>
                 <td><input type="number" v-model="productStock" /></td>
               </tr>
               <tr>
