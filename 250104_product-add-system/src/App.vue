@@ -1,4 +1,37 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref, type Ref } from 'vue'
+
+type productType = {
+  name: string
+  category: string
+  description: string
+  price: number
+  stock: number
+  imageUrl: string
+}
+
+const products: Ref<productType[]> = ref([])
+const productName = ref('test name')
+const productCategory = ref('food')
+const productDescription = ref('test desc')
+const productPrice = ref(100)
+const productStock = ref(10)
+const productImage = ref('https://placehold.jp/150x150.png')
+
+function addProduct(e: Event) {
+  e.preventDefault()
+  const product: productType = {
+    name: productName.value,
+    category: productCategory.value,
+    description: productDescription.value,
+    price: productPrice.value,
+    stock: productStock.value,
+    imageUrl: productImage.value,
+  }
+  console.table(product)
+  products.value.push(product)
+}
+</script>
 
 <template>
   <section class="wrapper">
@@ -10,54 +43,55 @@
       <section class="add-product">
         <h2>ADD PRODUCT</h2>
 
-        <form>
+        <form @submit="addProduct">
           <table>
             <tbody>
               <tr>
-                <th>商品名</th>
-                <td><input type="text" /></td>
+                <th>name</th>
+                <td><input type="text" v-model="productName" /></td>
               </tr>
               <tr>
-                <th>カテゴリー</th>
+                <th>category</th>
                 <td>
-                  <select name="" id="">
-                    <option value="">food</option>
-                    <option value="">beverage</option>
+                  <select name="" id="" v-model="productCategory">
+                    <option value="food">food</option>
+                    <option value="beverage">beverage</option>
                   </select>
                   <!-- カテゴリー追加画面も作る -->
                 </td>
               </tr>
               <tr>
-                <th>商品説明</th>
+                <th>description</th>
                 <td>
-                  <textarea name="" id=""></textarea>
+                  <textarea name="" id="" v-model="productDescription"></textarea>
                   <p>1000文字以内</p>
                 </td>
               </tr>
               <tr>
-                <th>値段</th>
+                <th>price</th>
                 <td>
-                  <input type="number" />
+                  <input type="number" v-model="productPrice" />
                   円
                 </td>
               </tr>
               <tr>
-                <th>1日の在庫数</th>
-                <td><input type="number" /></td>
+                <th>productStock</th>
+                <td><input type="number" v-model="productStock" /></td>
               </tr>
               <tr>
-                <th>商品画像</th>
+                <th>image</th>
                 <td>
-                  <input type="file" accept="image/png, image/jpeg" />
                   <!-- https://developer.mozilla.org/ja/docs/Web/HTML/Element/input/file -->
-                  とりあえず1枚ということにする
+                  <!-- input fileだとローカルストレージに画像保存大変なので、一旦URL保存して呼び出すタイプにする -->
+                  <input type="text" v-model="productImage" />
+                  <img :src="productImage" alt="" width="100" height="100" />
                 </td>
               </tr>
             </tbody>
           </table>
 
           <section class="buttons">
-            <button>追加</button>
+            <button type="submit">追加</button>
             <button>リセット</button>
           </section>
         </form>
@@ -72,29 +106,29 @@
           <thead>
             <tr>
               <th>img</th>
-              <th>title & description</th>
+              <th>name</th>
+              <th>description</th>
               <th>price</th>
               <th>stock</th>
+              <th>category</th>
               <th>edit</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>
-                <img
-                  src="https://images.unsplash.com/photo-1508170754725-6e9a5cfbcabf?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt=""
-                  width="80"
-                  height="80"
-                />
+            <tr v-for="product in products" :key="product.name">
+              <td class="image">
+                <img :src="product.imageUrl" alt="" width="48" height="48" />
               </td>
-              <td>
-                <div>お弁当名</div>
-                <div>お弁当の詳細</div>
+              <td class="name">
+                <div>{{ product.name }}</div>
               </td>
-              <td>1000</td>
-              <td>10/10</td>
-              <td><button>編集</button></td>
+              <td class="description">
+                <div>{{ product.description }}</div>
+              </td>
+              <td class="price">{{ product.price }}</td>
+              <td class="stock">{{ product.stock }}</td>
+              <td class="category">{{ product.category }}</td>
+              <td class="edit"><button>📝</button></td>
             </tr>
           </tbody>
         </table>
@@ -105,7 +139,7 @@
 
 <style scoped>
 .wrapper {
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto 80px;
 
   header {
@@ -173,13 +207,45 @@
       margin-top: 16px;
       width: 100%;
       border-collapse: collapse;
+      tr {
+        th {
+          background: #eee;
+        }
+        th,
+        td {
+          padding: 8px;
+          border: 1px solid #ccc;
+        }
+      }
       tbody {
-        tr {
-          th,
-          td {
-            padding: 8px;
-            border: 1px solid #ccc;
+        .image {
+          width: calc(48px + 16px);
+          text-align: center;
+
+          img {
+            object-fit: cover;
           }
+        }
+
+        .name {
+        }
+        .description {
+        }
+        .price {
+          width: 80px;
+          text-align: center;
+        }
+        .stock {
+          width: 80px;
+          text-align: center;
+        }
+        .category {
+          width: 80px;
+          text-align: center;
+        }
+        .edit {
+          width: 48px;
+          text-align: center;
         }
       }
     }
